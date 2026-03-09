@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Wolf Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0b1a0b;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    canvas {
+      background: #3c6e47;
+      display: block;
+      margin: 20px auto;
+      border: 4px solid #111;
+    }
+  </style>
+</head>
+<body>
+
+
+<h1>🐺 Wolf Game</h1>
+<p>Arrow keys to move • Eat the sheep 🐑</p>
+<button><a href ="Wolf.html">want to get back</a></button>
+<p id="score">Score: 0</p>
+
+<canvas id="game" width="500" height="300"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let score = 0;
+
+// wolf
+let wolf = {
+  x: 50,
+  y: 50,
+  size: 30,
+  speed: 4
+};
+
+// sheep
+let sheep = {
+  x: Math.random() * 460,
+  y: Math.random() * 260,
+  size: 20
+};
+
+let keys = {};
+
+// controls
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+function moveWolf() {
+  if (keys["ArrowUp"]) wolf.y -= wolf.speed;
+  if (keys["ArrowDown"]) wolf.y += wolf.speed;
+  if (keys["ArrowLeft"]) wolf.x -= wolf.speed;
+  if (keys["ArrowRight"]) wolf.x += wolf.speed;
+
+  // walls
+  wolf.x = Math.max(0, Math.min(canvas.width - wolf.size, wolf.x));
+  wolf.y = Math.max(0, Math.min(canvas.height - wolf.size, wolf.y));
+}
+
+function checkCollision() {
+  let dx = wolf.x - sheep.x;
+  let dy = wolf.y - sheep.y;
+  let dist = Math.sqrt(dx * dx + dy * dy);
+
+  if (dist < wolf.size) {
+    score++;
+    document.getElementById("score").innerText = "Score: " + score;
+    sheep.x = Math.random() * 460;
+    sheep.y = Math.random() * 260;
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // wolf (square)
+  ctx.fillStyle = "#555";
+  ctx.fillRect(wolf.x, wolf.y, wolf.size, wolf.size);
+
+  // sheep (circle)
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(sheep.x, sheep.y, sheep.size / 2, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function gameLoop() {
+  moveWolf();
+  checkCollision();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
